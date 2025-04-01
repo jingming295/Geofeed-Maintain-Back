@@ -1,12 +1,12 @@
 import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional, NonAttribute } from '@sequelize/core';
 import { Attribute, PrimaryKey, NotNull, AutoIncrement, BelongsTo } from '@sequelize/core/decorators-legacy';
-import { Users } from '../users/Users';
+import { ASN } from './ASN';
 
 
 
 
 
-export class ASN extends Model<InferAttributes<ASN>, InferCreationAttributes<ASN>>
+export class Prefixes extends Model<InferAttributes<Prefixes>, InferCreationAttributes<Prefixes>>
 {
     @Attribute(DataTypes.INTEGER)
     @PrimaryKey
@@ -14,18 +14,18 @@ export class ASN extends Model<InferAttributes<ASN>, InferCreationAttributes<ASN
     @AutoIncrement
     declare id: CreationOptional<number>;
 
-    @Attribute(DataTypes.STRING)
-    @NotNull
-    declare as_number: string;
 
     @Attribute(DataTypes.STRING)
     @NotNull
-    declare as_name: string;
-
+    declare prefix_name: string;
 
     @Attribute(DataTypes.INTEGER)
     @NotNull
-    declare user_id: string;
+    declare asn_id: number;
+
+    @Attribute(DataTypes.BOOLEAN)
+    @NotNull
+    declare is_present: boolean;
 
     @Attribute(DataTypes.BOOLEAN)
     @NotNull
@@ -35,7 +35,7 @@ export class ASN extends Model<InferAttributes<ASN>, InferCreationAttributes<ASN
     @NotNull
     declare is_deleted: boolean;
 
-    @BelongsTo(() => Users, 'user_id')
-    declare users?: NonAttribute<Users>;
+    @BelongsTo(() => ASN, 'asn_id')
+    declare asn?: NonAttribute<ASN>;
 
 }
