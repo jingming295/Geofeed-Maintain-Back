@@ -25,7 +25,7 @@ export class ASN extends Model<InferAttributes<ASN>, InferCreationAttributes<ASN
 
     @Attribute(DataTypes.INTEGER)
     @NotNull
-    declare user_id: string;
+    declare user_id: number;
 
     @Attribute(DataTypes.BOOLEAN)
     @NotNull

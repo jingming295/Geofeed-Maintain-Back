@@ -1,8 +1,8 @@
 import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional, NonAttribute } from '@sequelize/core';
 import { Attribute, PrimaryKey, NotNull, AutoIncrement, AllowNull, BelongsTo } from '@sequelize/core/decorators-legacy';
-import { Country } from './Country';
+import { City } from './City';
 
-export class Region extends Model<InferAttributes<Region>, InferCreationAttributes<Region>>
+export class Zipcode extends Model<InferAttributes<Zipcode>, InferCreationAttributes<Zipcode>>
 {
     @Attribute(DataTypes.INTEGER)
     @PrimaryKey
@@ -11,21 +11,17 @@ export class Region extends Model<InferAttributes<Region>, InferCreationAttribut
     declare id: CreationOptional<number>;
 
     @Attribute(DataTypes.STRING)
-    @NotNull
-    declare code_3166_2: string;
-
-    @Attribute(DataTypes.STRING)
     @AllowNull
     declare name: string | null;
 
     @Attribute(DataTypes.INTEGER)
     @NotNull
-    declare country_id: number;
+    declare city_id: number;
 
     @Attribute(DataTypes.BOOLEAN)
     @NotNull
     declare is_deleted: boolean;
 
-    @BelongsTo(() => Country, 'country_id')
-    declare country?: NonAttribute<Country>;
+    @BelongsTo(() => City, 'city_id')
+    declare city?: NonAttribute<City>;
 }

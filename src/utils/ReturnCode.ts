@@ -16,7 +16,8 @@ export enum Code
     InvalidFileType = -121,
     FileVerificationFailed = -122,
     FileAlreadyExists = -123,
-    NotPaid = -130
+    NotPaid = -130,
+    DataExists = -140,
 }
 
 export function ReturnCode(codeString: keyof typeof Code): number

@@ -4,6 +4,11 @@ import { MariaDbDialect } from "@sequelize/mariadb";
 import { User_Roles } from "./models/users/User_Roles";
 import { Users } from "./models/users/Users";
 import { ASN } from "./models/asn/ASN";
+import { Country } from "./models/geolocation/Country";
+import { Subdivision } from "./models/geolocation/Subdivision";
+import { City } from "./models/geolocation/City";
+import { Zipcode } from "./models/geolocation/Zipcode";
+import { Prefixes } from "./models/asn/Prefixes";
 
 
 export class SQInit
@@ -54,10 +59,15 @@ export class SQInit
             models: [
                 User_Roles,
                 Users,
-                ASN
+                ASN,
+                Country,
+                Subdivision,
+                City,
+                Zipcode,
+                Prefixes
             ]
         });
-        await sequelize.sync();
+        await sequelize.sync({ force: database.databaseDevMode }); // force: true will drop the table if it already exists
         this.Sequelize = sequelize;
         console.log("All models were synchronized successfully.");
     }

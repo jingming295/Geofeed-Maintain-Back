@@ -7,6 +7,7 @@ import { Config } from './types/Config';
 import { SQInit } from './SQ/SQInit';
 import { SQInsert } from './SQ/SQInsert';
 import FileStore from "session-file-store"; // 引入文件存储
+import { Route_ASN } from './routes/asn/Route_ASN';
 
 class App
 {
@@ -16,6 +17,7 @@ class App
     {
         if (!this.app)
         {
+            this.test() // 测试函数，获取国家代码
             this.app = express();
 
             // 设置 CORS 策略
@@ -30,7 +32,11 @@ class App
 
             await SQInit.init(config)
 
-            const sqInsertResult = await SQInsert.initInsert.insertDefaultUser()
+            const sqInsertResult = await SQInsert.initInsert.insertDefault()
+
+            const sqLocInsertResult = await SQInsert.initInsert.insertDefaultLocation(config)
+
+            if (sqLocInsertResult.error) throw new Error(sqLocInsertResult.message)
 
             if (sqInsertResult.error) throw new Error(sqInsertResult.message)
 
@@ -76,6 +82,7 @@ class App
         });
 
         Route_Auth.setRoute(this.app);
+        Route_ASN.setRoute(this.app);
     }
 
     private static startServer(): void
@@ -109,6 +116,8 @@ class App
         const redispassword = process.env.REDIS_PASSWORD || undefined
 
         const devMode = process.env.DEV_MODE === 'true';
+
+        const geonamesUsername = process.env.GEONAMES_USERNAME || missingEnvVars.push('GEONAMES_USERNAME');
         // 如果存在缺失的变量，抛出错误并提示缺失的变量名
         if (missingEnvVars.length > 0)
         {
@@ -119,6 +128,7 @@ class App
             serverPort: parseInt(serverPort as string),
             websiteUrl: websiteUrl as string,
             websiteName: websiteName as string,
+            geonamesUsername: geonamesUsername as string,
             database: {
                 databaseName: dbName as string,
                 username: dbUsername as string,
@@ -134,6 +144,11 @@ class App
         };
 
         return config;
+    }
+
+    private static async test(): Promise<void>
+    {
+
     }
 }
 dotenv.config();

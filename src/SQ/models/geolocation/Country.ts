@@ -17,6 +17,11 @@ export class Country extends Model<InferAttributes<Country>, InferCreationAttrib
     @NotNull
     declare alpha_3_code: string;
 
+
+    @Attribute(DataTypes.STRING)
+    @NotNull
+    declare iso_numeric: string;
+
     @Attribute(DataTypes.STRING)
     @NotNull
     declare name: string;

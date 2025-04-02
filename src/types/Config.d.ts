@@ -4,6 +4,7 @@ export interface Config
     serverPort: number,
     websiteUrl: string,
     websiteName: string,
+    geonamesUsername: string,
     database: {
         databaseName: string,
         username: string,
