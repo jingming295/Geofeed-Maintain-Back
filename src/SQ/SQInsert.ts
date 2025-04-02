@@ -1,7 +1,7 @@
 import { DatabaseResult } from "@/types/DatabaseResult";
 import { Users } from "./models/users/Users";
 import { SQInit } from "./SQInit";
-import { CryptoUtils } from "@/routes/tools/CryptoUtils";
+import { CryptoUtils } from "@/utils/CryptoUtils";
 import { User_Roles } from "./models/users/User_Roles";
 
 export class SQInsert extends SQInit

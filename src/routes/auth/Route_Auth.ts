@@ -1,9 +1,9 @@
 import { Application, Request } from "express";
-import { InputControl } from "../tools/InputControl";
-import { ReturnCode } from "../tools/ReturnCode";
+import { InputControl } from "@/utils/InputControl";
+import { ReturnCode } from "@/utils/ReturnCode";
 import { CommonResponse } from "@/types/CommonResponse";
 import { Routes } from "../Routes";
-import { CryptoUtils } from "../tools/CryptoUtils";
+import { CryptoUtils } from "@/utils/CryptoUtils";
 import { SQSelect } from "@/SQ/SQSelect";
 import { SessionDataUser } from "@/types/session";
 

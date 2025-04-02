@@ -1,6 +1,6 @@
 import { CommonResponse } from "@/types/CommonResponse";
 import { Request, Response } from "express";
-import { ReturnCode } from "./tools/ReturnCode";
+import { ReturnCode } from "../utils/ReturnCode";
 
 export class Routes
 {
