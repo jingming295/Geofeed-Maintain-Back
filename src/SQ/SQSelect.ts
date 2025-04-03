@@ -3,6 +3,10 @@ import { Users } from "./models/users/Users";
 import { SQInit } from "./SQInit";
 import { ASN } from "./models/asn/ASN";
 import { Prefixes } from "./models/asn/Prefixes";
+import { Subdivision } from "./models/geolocation/Subdivision";
+import { Country } from "./models/geolocation/Country";
+import { City } from "./models/geolocation/City";
+import { Zipcode } from "./models/geolocation/Zipcode";
 
 export class SQSelect extends SQInit
 {
@@ -150,7 +154,74 @@ export class SQSelect extends SQInit
                     error: true,
                 }
             }
+        },
+        validateASNUser: async (asn: string, userId: number): Promise<DatabaseResult<ASN | null>> =>
+        {
+            try
+            {
+                const asnResult = await ASN.findOne({
+                    where: {
+                        as_number: asn,
+                        user_id: userId
+                    }
+                })
+
+
+                return {
+                    message: "ASN found",
+                    data: asnResult,
+                }
+
+            } catch (error)
+            {
+                console.error("Error in asn.validateASNUser: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
         }
+    }
+
+    public static prefix = {
+        getPrefixByASNId: async (asnId: number): Promise<DatabaseResult<Prefixes[]>> =>
+        {
+            try
+            {
+                const prefixResult = await Prefixes.findAll({
+                    where: {
+                        asn_id: asnId
+                    },
+                    include: [
+                        {
+                            model: Country
+                        },
+                        {
+                            model: Subdivision
+                        },
+                        {
+                            model: City
+                        },
+                        {
+                            model: Zipcode
+                        }
+                    ]
+                })
+
+                return {
+                    message: "Prefix found",
+                    data: prefixResult,
+                }
+
+            } catch (error)
+            {
+                console.error("Error in prefix.getPrefixByASNId: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
     }
 
 }

@@ -8,6 +8,7 @@ import { SQInit } from './SQ/SQInit';
 import { SQInsert } from './SQ/SQInsert';
 import FileStore from "session-file-store"; // 引入文件存储
 import { Route_ASN } from './routes/asn/Route_ASN';
+import { Route_Prefix } from './routes/prefix/Route_Prefix';
 
 class App
 {
@@ -83,6 +84,7 @@ class App
 
         Route_Auth.setRoute(this.app);
         Route_ASN.setRoute(this.app);
+        Route_Prefix.setRoute(this.app);
     }
 
     private static startServer(): void
