@@ -59,3 +59,8 @@ interface CountryInfo
 
 }
 
+export interface CountryDataResponse
+{
+    id: number;
+    name: string;
+}

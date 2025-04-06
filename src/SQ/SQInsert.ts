@@ -9,6 +9,9 @@ import { Config } from "@/types/Config";
 import { Subdivision } from "./models/geolocation/Subdivision";
 import { ASN } from "./models/asn/ASN";
 import { Prefixes } from "./models/asn/Prefixes";
+import { CountryInfo, DivisionData } from "@/types/CountryData";
+import { City } from "./models/geolocation/City";
+import { Zipcode } from "./models/geolocation/Zipcode";
 
 export class SQInsert extends SQInit
 {
@@ -63,7 +66,6 @@ export class SQInsert extends SQInit
             try
             {
                 const countryResult = await Country.findOne();
-
                 if (countryResult) return { message: "Country already exists" };
 
                 const rawData = await ISO.getAllCountryCode(config);
@@ -185,6 +187,63 @@ export class SQInsert extends SQInit
             } catch (error)
             {
                 console.error("Error in SQInsert.prefix.insertNewPrefix: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        }
+    }
+
+    public static location = {
+        insertNewCity: async (cityName: string, countryId: number, subdivisionId: number | null): Promise<DatabaseResult<City>> =>
+        {
+            let trueCountryId: number | null = countryId
+            if (subdivisionId)
+            {
+                trueCountryId = null
+            }
+            try
+            {
+                const cityResult = await City.create({
+                    name: cityName,
+                    country_id: trueCountryId,
+                    subdivision_id: subdivisionId,
+                    is_deleted: false,
+                })
+
+                return {
+                    message: "City created",
+                    data: cityResult,
+                }
+            } catch (error)
+            {
+                console.error("Error in SQInsert.location.insertNewCity: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+
+
+        },
+        insertNewZipCode: async (zipcode: string, cityId: number): Promise<DatabaseResult<Zipcode>> =>
+        {
+            try
+            {
+                const zipcodeResult = await Zipcode.create({
+                    name: zipcode,
+                    city_id: cityId,
+                    is_deleted: false,
+                })
+
+                return {
+                    message: "ZipCode created",
+                    data: zipcodeResult,
+                }
+            } catch (error)
+            {
+                console.error("Error in SQInsert.location.insertNewZipCode: ", error);
                 return {
                     message: "Database error",
                     error: true,

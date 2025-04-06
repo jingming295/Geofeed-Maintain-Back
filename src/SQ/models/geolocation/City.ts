@@ -1,6 +1,7 @@
 import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional, NonAttribute } from '@sequelize/core';
 import { Attribute, PrimaryKey, NotNull, AutoIncrement, AllowNull, BelongsTo } from '@sequelize/core/decorators-legacy';
 import { Subdivision } from './Subdivision';
+import { Country } from './Country';
 
 export class City extends Model<InferAttributes<City>, InferCreationAttributes<City>>
 {
@@ -15,8 +16,12 @@ export class City extends Model<InferAttributes<City>, InferCreationAttributes<C
     declare name: string | null;
 
     @Attribute(DataTypes.INTEGER)
-    @NotNull
-    declare subdivision_id: number;
+    @AllowNull
+    declare subdivision_id: number | null;
+
+    @Attribute(DataTypes.INTEGER)
+    @AllowNull
+    declare country_id: number | null;
 
     @Attribute(DataTypes.BOOLEAN)
     @NotNull
@@ -24,4 +29,7 @@ export class City extends Model<InferAttributes<City>, InferCreationAttributes<C
 
     @BelongsTo(() => Subdivision, 'subdivision_id')
     declare subdivision?: NonAttribute<Subdivision>;
+
+    @BelongsTo(() => Country, 'country_id')
+    declare country?: NonAttribute<Country>;
 }

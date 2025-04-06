@@ -222,6 +222,388 @@ export class SQSelect extends SQInit
                 }
             }
         },
+        getPrefixById: async (id: number, userID: number): Promise<DatabaseResult<Prefixes | null>> =>
+        {
+            try
+            {
+                const prefixResult = await Prefixes.findOne({
+                    where: {
+                        id: id,
+
+                    },
+                    include: [
+                        {
+                            model: Country
+                        },
+                        {
+                            model: Subdivision
+                        },
+                        {
+                            model: City
+                        },
+                        {
+                            model: Zipcode
+                        },
+                        {
+                            model: ASN,
+                            where: {
+                                user_id: userID
+                            }
+                        }
+                    ]
+                })
+
+                return {
+                    message: "Prefix found",
+                    data: prefixResult,
+                }
+
+            } catch (error)
+            {
+                console.error("Error in prefix.getPrefixById: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
+    }
+
+    public static geolocation = {
+        getCountryList: async (): Promise<DatabaseResult<Country[]>> =>
+        {
+            try
+            {
+                const countryResult = await Country.findAll({
+                    where: {
+                        is_deleted: false
+                    }
+                })
+
+                return {
+                    message: "Country found",
+                    data: countryResult,
+                }
+
+            } catch (error)
+            {
+                console.error("Error in geolocation.getCountry: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
+        getSubDivisionByCountry: async (countryID: number): Promise<DatabaseResult<Subdivision[]>> =>
+        {
+            try
+            {
+                const subdivisionResult = await Subdivision.findAll({
+                    where: {
+                        country_id: countryID,
+                        is_deleted: false
+                    }
+                })
+
+                return {
+                    message: "Subdivision found",
+                    data: subdivisionResult,
+                }
+
+            } catch (error)
+            {
+                console.error("Error in geolocation.getSubDivisionByCountry: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
+        getCountryByID: async (countryID: number): Promise<DatabaseResult<Country | null>> =>
+        {
+            try
+            {
+                const countryResult = await Country.findOne({
+                    where: {
+                        id: countryID,
+                        is_deleted: false
+                    }
+                })
+
+                return {
+                    message: "Country found",
+                    data: countryResult,
+                }
+
+            } catch (error)
+            {
+                console.error("Error in geolocation.getCountryByID: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
+        getCityBySubdivisionID: async (subdivisionID: number): Promise<DatabaseResult<City[]>> =>
+        {
+            try
+            {
+                const cityResult = await City.findAll({
+                    where: {
+                        subdivision_id: subdivisionID,
+                        is_deleted: false
+                    }
+                })
+
+                return {
+                    message: "City found",
+                    data: cityResult,
+                }
+
+            } catch (error)
+            {
+                console.error("Error in geolocation.getCityBySubdivisionID: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
+        getCityByCountryID: async (countryID: number): Promise<DatabaseResult<City[]>> =>
+        {
+            try
+            {
+                const cityResult = await City.findAll({
+                    where: {
+                        country_id: countryID,
+                        is_deleted: false
+                    }
+                })
+
+                return {
+                    message: "City found",
+                    data: cityResult,
+                }
+
+            } catch (error)
+            {
+                console.error("Error in geolocation.getCityByCountryID: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
+        getZipCodeByCityID: async (cityID: number): Promise<DatabaseResult<Zipcode[]>> =>
+        {
+            try
+            {
+                const zipcodeResult = await Zipcode.findAll({
+                    where: {
+                        city_id: cityID,
+                        is_deleted: false
+                    }
+                })
+
+                return {
+                    message: "Zipcode found",
+                    data: zipcodeResult,
+                }
+
+            } catch (error)
+            {
+                console.error("Error in geolocation.getZipCodeByCityID: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
+        validateSubdivision: async (subdivisionID: number, countryID: number): Promise<DatabaseResult<Subdivision | null>> =>
+        {
+            try
+            {
+                const subdivisionResult = await Subdivision.findOne({
+                    where: {
+                        id: subdivisionID,
+                        country_id: countryID,
+                        is_deleted: false
+                    },
+                    include: [
+                        {
+                            model: Country
+                        }
+                    ]
+                })
+
+                if (!subdivisionResult)
+                {
+                    return {
+                        message: "Subdivision not found",
+                    }
+                }
+
+                return {
+                    message: "Subdivision found",
+                    data: subdivisionResult,
+                }
+
+
+
+            } catch (error)
+            {
+                console.error("Error in geolocation.getCountryBySubdivisionID: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
+        checkCityNameExist: async (cityName: string, countryid: number | null, subdivisionID: number | null): Promise<DatabaseResult<City | null>> =>
+        {
+            if (subdivisionID)
+            {
+                countryid = null;
+            }
+            try
+            {
+                const cityResult = await City.findOne({
+                    where: {
+                        name: cityName,
+                        country_id: countryid,
+                        subdivision_id: subdivisionID,
+                        is_deleted: false
+                    }
+                })
+
+                if (!cityResult)
+                {
+                    return {
+                        message: "City not found",
+                    }
+                }
+                return {
+                    message: "City found",
+                    data: cityResult,
+                }
+
+
+            } catch (error)
+            {
+                console.error("Error in geolocation.checkCityNameExist: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
+        checkZipCodeNameExist: async (zipcode: string, cityID: number): Promise<DatabaseResult<Zipcode | null>> =>
+        {
+            try
+            {
+                const zipcodeResult = await Zipcode.findOne({
+                    where: {
+                        name: zipcode,
+                        city_id: cityID,
+                        is_deleted: false
+                    }
+                })
+
+                if (!zipcodeResult)
+                {
+                    return {
+                        message: "Zipcode not found",
+                    }
+                }
+
+                return {
+                    message: "Zipcode found",
+                    data: zipcodeResult,
+                }
+
+
+            } catch (error)
+            {
+                console.error("Error in geolocation.checkZipCodeNameExist: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
+        validateCityID: async (cityID: number, countryID: number | null, subdivisionID: number | null): Promise<DatabaseResult<City | null>> =>
+        {
+            if (subdivisionID)
+            {
+                countryID = null;
+            }
+            try
+            {
+                const cityResult = await City.findOne({
+                    where: {
+                        id: cityID,
+                        country_id: countryID,
+                        subdivision_id: subdivisionID,
+                        is_deleted: false
+                    }
+                })
+
+                if (!cityResult)
+                {
+                    return {
+                        message: "City not found",
+                    }
+                }
+
+                return {
+                    message: "City found",
+                    data: cityResult,
+                }
+
+
+            } catch (error)
+            {
+                console.error("Error in geolocation.validateCityID: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
+        validateZipCodeID: async (zipcodeID: number, cityID: number): Promise<DatabaseResult<Zipcode | null>> =>
+        {
+            try
+            {
+                const zipcodeResult = await Zipcode.findOne({
+                    where: {
+                        id: zipcodeID,
+                        city_id: cityID,
+                        is_deleted: false
+                    }
+                })
+
+                if (!zipcodeResult)
+                {
+                    return {
+                        message: "Zipcode not found",
+                    }
+                }
+
+                return {
+                    message: "Zipcode found",
+                    data: zipcodeResult,
+                }
+
+
+            } catch (error)
+            {
+                console.error("Error in geolocation.validateZipCodeID: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        }
     }
 
 }
