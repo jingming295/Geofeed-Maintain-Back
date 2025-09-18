@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application } from 'express';
 import cors from 'cors';
 import session from 'express-session';
 import { Route_Auth } from './routes/auth/Route_Auth';
@@ -10,6 +10,7 @@ import FileStore from "session-file-store"; // 引入文件存储
 import { Route_ASN } from './routes/asn/Route_ASN';
 import { Route_Prefix } from './routes/prefix/Route_Prefix';
 import { Route_Location } from './routes/location/Route_Location';
+import path from 'path';
 
 class App
 {
@@ -75,19 +76,25 @@ class App
             }
         }));
     }
-
     private static setupRoutes(): void
     {
-        this.app.get('/', (req: Request, res: Response) =>
-        {
-            res.send('Hello');
-        });
-
+        // First, set up all API routes
         Route_Auth.setRoute(this.app);
         Route_ASN.setRoute(this.app);
         Route_Prefix.setRoute(this.app);
         Route_Location.setRoute(this.app);
+
+        // Then, configure the static middleware for serving frontend files
+        this.app.use(express.static(path.join(process.cwd(), '/frontend/dist')));
+
+        // Finally, add a fallback route for SPA (Single Page Application) routing
+        this.app.get('*', (req, res) =>
+        {
+            const frontend = path.join(process.cwd(), '/frontend/dist/index.html');
+            res.sendFile(frontend);
+        });
     }
+
 
     private static startServer(): void
     {
@@ -102,24 +109,10 @@ class App
     {
         const missingEnvVars: string[] = []; // 用于记录缺失的变量名
 
-        const serverHost = process.env.THIS_SERVER_HOST || missingEnvVars.push('THIS_SERVER_HOST');
-        const serverPort = process.env.THIS_SERVER_PORT || missingEnvVars.push('THIS_SERVER_PORT');
-        const websiteUrl = process.env.WEBSITE_URL || missingEnvVars.push('WEBSITE_URL');
-        const websiteName = process.env.WEBSITE_NAME || missingEnvVars.push('WEBSITE_NAME');
-
         const dbName = process.env.DATABASE_NAME || missingEnvVars.push('DATABASE_NAME');
         const dbUsername = process.env.DATABASE_USERNAME || missingEnvVars.push('DATABASE_USERNAME');
         const dbPassword = process.env.DATABASE_PASSWORD || ""
-        const dbDialect = process.env.DATABASE_DIALECT || missingEnvVars.push('DATABASE_DIALECT');
         const dbDatabaseHost = process.env.DATABASE_HOST || missingEnvVars.push('DATABASE_HOST');
-
-        const databaseLogging = process.env.DATABASE_LOGGING === 'true';
-        const databaseTimestamp = process.env.DATABASE_TIMESTAMP === 'true';
-        const databaseDevMode = process.env.DATABASE_DEV_MODE === 'true';
-
-        const redispassword = process.env.REDIS_PASSWORD || undefined
-
-        const devMode = process.env.DEV_MODE === 'true';
 
         const geonamesUsername = process.env.GEONAMES_USERNAME || missingEnvVars.push('GEONAMES_USERNAME');
         // 如果存在缺失的变量，抛出错误并提示缺失的变量名
@@ -128,23 +121,13 @@ class App
             throw new Error(`Missing environment variables: ${missingEnvVars.join(', ')}`);
         }
         const config: Config = {
-            serverHost: serverHost as string,
-            serverPort: parseInt(serverPort as string),
-            websiteUrl: websiteUrl as string,
-            websiteName: websiteName as string,
             geonamesUsername: geonamesUsername as string,
             database: {
                 databaseName: dbName as string,
                 username: dbUsername as string,
                 password: dbPassword as string,
-                dialect: dbDialect as string,
                 databaseHost: dbDatabaseHost as string,
-                databaseLogging: databaseLogging,
-                databaseTimestamp: databaseTimestamp,
-                databaseDevMode: databaseDevMode,
             },
-            redispassword: redispassword as string,
-            devMode: devMode,
         };
 
         return config;

@@ -1,19 +1,15 @@
 {
   "compilerOptions": {
-    "module": "NodeNext", // 这里使用 ESNext
-    "target": "ESNext", // 编译到最新的 ES 标准
-    "esModuleInterop": true, // 允许在 CommonJS 中使用默认导入
-    "moduleResolution": "nodenext", // 启用 Node.js 模块解析
-    "strict": true, // 启用严格模式
-    "allowSyntheticDefaultImports": true, // 允许默认导入
+    "module": "NodeNext",
+    "target": "ESNext",
+    "esModuleInterop": true,
+    "moduleResolution": "nodenext",
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "experimentalDecorators": true, // 启用实验性装饰器
+    "experimentalDecorators": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    }
+    "outDir": "./dist",
+    "rootDir": "./src"
   }
 }

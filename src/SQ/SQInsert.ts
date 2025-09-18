@@ -1,15 +1,15 @@
-import { DatabaseResult } from "@/types/DatabaseResult";
+import { DatabaseResult } from "../types/DatabaseResult";
 import { Users } from "./models/users/Users";
 import { SQInit } from "./SQInit";
-import { CryptoUtils } from "@/utils/CryptoUtils";
+import { CryptoUtils } from "../utils/CryptoUtils";
 import { User_Roles } from "./models/users/User_Roles";
-import { ISO } from "@/request/iso/ISO";
+import { ISO } from "../request/iso/ISO";
 import { Country } from "./models/geolocation/Country";
-import { Config } from "@/types/Config";
+import { Config } from "../types/Config";
 import { Subdivision } from "./models/geolocation/Subdivision";
 import { ASN } from "./models/asn/ASN";
 import { Prefixes } from "./models/asn/Prefixes";
-import { CountryInfo, DivisionData } from "@/types/CountryData";
+import { CountryInfo, DivisionData } from "../types/CountryData";
 import { City } from "./models/geolocation/City";
 import { Zipcode } from "./models/geolocation/Zipcode";
 
@@ -26,7 +26,7 @@ export class SQInsert extends SQInit
                     const usersResult = await Users.findAll();
                     if (usersResult.length) return { message: "User already exists" };
 
-                    const password = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'
+                    const password = '828d0f36672aef63adf4489c88f4b0b1b0ff43ad731b4d52c0051815c19a3243'
 
                     const hashedPassword = CryptoUtils.saltAndToSHA256(password);
 
@@ -168,16 +168,17 @@ export class SQInsert extends SQInit
     }
 
     public static prefix = {
-        insertNewPrefix: async (asnId: number, prefix: string): Promise<DatabaseResult<Prefixes>> =>
+        insertNewPrefix: async (asnId: number, prefix: string): Promise<DatabaseResult<[entity: Prefixes, created: boolean]>> =>
         {
             try
             {
-                const prefixResult = await Prefixes.create({
-                    prefix: prefix,
-                    asn_id: asnId,
-                    is_present: true,
-                    is_active: true,
-                    is_deleted: false,
+                const prefixResult = await Prefixes.findOrCreate({
+                    where: {
+                        asn_id: asnId,
+                        prefix: prefix,
+                        is_deleted: false,
+                        is_active: true,
+                    }
                 })
 
                 return {

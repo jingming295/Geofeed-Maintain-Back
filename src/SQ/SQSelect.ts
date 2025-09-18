@@ -1,4 +1,4 @@
-import { DatabaseResult } from "@/types/DatabaseResult";
+import { DatabaseResult } from "../types/DatabaseResult";
 import { Users } from "./models/users/Users";
 import { SQInit } from "./SQInit";
 import { ASN } from "./models/asn/ASN";
@@ -15,7 +15,7 @@ export class SQSelect extends SQInit
     public static auth = {
         login: async (email: string, password: string): Promise<DatabaseResult<Users>> =>
         {
-
+            console.log("email: ", email, " password: ", password)
             try
             {
                 const userresult = await Users.findOne({
@@ -25,7 +25,7 @@ export class SQSelect extends SQInit
                         is_active: true
                     }
                 })
-
+                console.log(userresult)
                 if (!userresult)
                 {
                     return {
@@ -180,6 +180,31 @@ export class SQSelect extends SQInit
                     error: true,
                 }
             }
+        },
+        getASNByID: async (asnID: number): Promise<DatabaseResult<ASN | null>> =>
+        {
+            try
+            {
+                const asnResult = await ASN.findOne({
+                    where: {
+                        id: asnID
+                    }
+                })
+
+
+                return {
+                    message: "ASN found",
+                    data: asnResult,
+                }
+
+            } catch (error)
+            {
+                console.error("Error in asn.getASNByID: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
         }
     }
 
@@ -270,6 +295,44 @@ export class SQSelect extends SQInit
     }
 
     public static geolocation = {
+        getAllPrefixAndLocationByASNId: async (asnId: number): Promise<DatabaseResult<Prefixes[]>> =>
+        {
+            try
+            {
+                const prefixResult = await Prefixes.findAll({
+                    where: {
+                        asn_id: asnId
+                    },
+                    include: [
+                        {
+                            model: Country
+                        },
+                        {
+                            model: Subdivision
+                        },
+                        {
+                            model: City
+                        },
+                        {
+                            model: Zipcode
+                        }
+                    ]
+                })
+
+                return {
+                    message: "Prefix found",
+                    data: prefixResult,
+                }
+
+            } catch (error)
+            {
+                console.error("Error in geolocation.getAllPrefixAndLocationByASNId: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
         getCountryList: async (): Promise<DatabaseResult<Country[]>> =>
         {
             try

@@ -1,11 +1,11 @@
 import { Application, Request } from "express";
-import { InputControl } from "@/utils/InputControl";
-import { ReturnCode } from "@/utils/ReturnCode";
-import { CommonResponse } from "@/types/CommonResponse";
+import { InputControl } from "../../utils/InputControl";
+import { ReturnCode } from "../../utils/ReturnCode";
+import { CommonResponse } from "../../types/CommonResponse";
 import { Routes } from "../Routes";
-import { CryptoUtils } from "@/utils/CryptoUtils";
-import { SQSelect } from "@/SQ/SQSelect";
-import { SessionDataUser } from "@/types/session";
+import { CryptoUtils } from "../../utils/CryptoUtils";
+import { SQSelect } from "../../SQ/SQSelect";
+import { SessionDataUser } from "../../types/session";
 
 export class Route_Auth extends Routes
 {
@@ -15,13 +15,15 @@ export class Route_Auth extends Routes
         app.post(`${this.routeName}/login`, (req, res) => this.middleware(req, res, this.login));
 
         app.post(`${this.routeName}/verifyuser`, (req, res) => this.middleware(req, res, this.verifyUser));
+
+        app.post(`${this.routeName}/logout`, (req, res) => this.middleware(req, res, this.logout));
     }
 
 
     private static login = async (req: Request): Promise<CommonResponse<SessionDataUser>> =>
     {
         const body: { email: string, password: string } = req.body;
-        if (req.session.user) return this.buildResponse(ReturnCode('OPSuccess'), "Already logged in", req.session.user);
+        if (req.session.user) return this.buildResponse(ReturnCode('OPSuccess'), "Login Sucessful", req.session.user);
         const validateEmail = InputControl.validateEmail(body.email);
         const validatePassword = InputControl.validatePassword(body.password);
 
@@ -108,6 +110,27 @@ export class Route_Auth extends Routes
         } catch (error)
         {
             console.error("Error in verifyUser:", error);
+            return this.buildResponse(ReturnCode('ISE'), "Internal Server Error");
+        }
+    };
+
+    private static logout = async (req: Request): Promise<CommonResponse<null>> =>
+    {
+        try
+        {
+            // 销毁会话
+            req.session.destroy(err =>
+            {
+                if (err)
+                {
+                    console.error("Failed to destroy session:", err);
+                }
+            });
+
+            return this.buildResponse(ReturnCode('OPSuccess'), "Logout Successful", null);
+        } catch (error)
+        {
+            console.error("Error in logout:", error);
             return this.buildResponse(ReturnCode('ISE'), "Internal Server Error");
         }
     };

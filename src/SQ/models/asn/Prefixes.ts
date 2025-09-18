@@ -43,8 +43,8 @@ export class Prefixes extends Model<InferAttributes<Prefixes>, InferCreationAttr
     declare zipcode_id: number | null;
 
     @Attribute(DataTypes.BOOLEAN)
-    @NotNull
-    declare is_present: boolean;
+    @AllowNull
+    declare is_present: boolean | null;
 
     @Attribute(DataTypes.BOOLEAN)
     @NotNull

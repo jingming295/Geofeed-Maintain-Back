@@ -1,6 +1,6 @@
-import { Config } from "@/types/Config";
+import { Config } from "../../types/Config";
 import { SendRequest } from "../SendRequest";
-import { CountryData, DivisionData } from "@/types/CountryData";
+import { CountryData, DivisionData } from "../../types/CountryData";
 
 export class ISO extends SendRequest
 {

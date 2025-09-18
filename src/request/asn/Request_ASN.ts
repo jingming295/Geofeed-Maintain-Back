@@ -1,4 +1,4 @@
-import { AnnouncedPrefixesFromRile } from "@/types/ASN";
+import { AnnouncedPrefixesFromRile } from "../../types/ASN";
 import { SendRequest } from "../SendRequest";
 
 export class Request_ASN extends SendRequest

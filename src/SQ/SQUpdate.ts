@@ -1,6 +1,6 @@
 import { SQInit } from "./SQInit";
 import { Prefixes } from "./models/asn/Prefixes";
-import { DatabaseResult } from "@/types/DatabaseResult";
+import { DatabaseResult } from "../types/DatabaseResult";
 
 export class SQUpdate extends SQInit
 {
@@ -112,6 +112,33 @@ export class SQUpdate extends SQInit
             } catch (error)
             {
                 console.error("Error during updatePrefixZipCodeID:", error);
+                return {
+                    error: true,
+                    message: "Internal Server Error",
+                };
+            }
+        },
+        updatePrefixSubdivitionToNull: async (prefixID: number): Promise<DatabaseResult<[affectedCount: number]>> =>
+        {
+            try
+            {
+                const result = await Prefixes.update({ subdivision_id: null }, { where: { id: prefixID } });
+                if (result[0] === 0)
+                {
+                    return {
+                        error: true,
+                        message: "No rows updated",
+                    };
+                }
+                return {
+                    error: false,
+                    message: "Update successful",
+                    data: result,
+                };
+
+            } catch (error)
+            {
+                console.error("Error during updatePrefixSubdivitionToNull:", error);
                 return {
                     error: true,
                     message: "Internal Server Error",

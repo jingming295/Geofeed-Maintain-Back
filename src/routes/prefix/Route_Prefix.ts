@@ -1,10 +1,10 @@
 import { Application } from "express";
 import { Routes } from "../Routes";
 import { Request } from "express";
-import { CommonResponse } from "@/types/CommonResponse";
-import { ReturnCode } from "@/utils/ReturnCode";
-import { PrefixData } from "@/types/Prefix";
-import { SQSelect } from "@/SQ/SQSelect";
+import { CommonResponse } from "../../types/CommonResponse";
+import { ReturnCode } from "../../utils/ReturnCode";
+import { PrefixData } from "../../types/Prefix";
+import { SQSelect } from "../../SQ/SQSelect";
 
 export class Route_Prefix extends Routes
 {
@@ -70,6 +70,8 @@ export class Route_Prefix extends Routes
 
         for (const prefix of prefixResult.data)
         {
+
+            const subdivisionName = (prefix.subdivision && prefix.country) ? `${prefix.country.alpha_2_code}-${prefix.subdivision.code_3166_2}` : 'Unknown'
             prefixData.push({
                 id: prefix.id,
                 Prefix: prefix.prefix,
@@ -82,7 +84,7 @@ export class Route_Prefix extends Routes
                 SubDivisions: prefix.subdivision
                     ? {
                         id: prefix.subdivision.id,
-                        name: prefix.subdivision.name ?? "Unknown", // Fallback if name is null
+                        name: subdivisionName
                     }
                     : null, // If subdivision is null, set it as null
                 City: prefix.city

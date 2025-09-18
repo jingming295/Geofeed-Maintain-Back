@@ -1,14 +1,15 @@
-import { Application } from "express";
+import { Application, Response } from "express";
 import { Routes } from "../Routes";
 import { Request } from "express";
-import { CommonResponse } from "@/types/CommonResponse";
-import { ReturnCode } from "@/utils/ReturnCode";
-import { SQSelect } from "@/SQ/SQSelect";
-import { CountryDataResponse } from "@/types/CountryData";
-import { UpdatePrefixData } from "@/types/Prefix";
-import { SQUpdate } from "@/SQ/SQUpdate";
-import { SQInsert } from "@/SQ/SQInsert";
-
+import { CommonResponse } from "../../types/CommonResponse";
+import { ReturnCode } from "../../utils/ReturnCode";
+import { SQSelect } from "../../SQ/SQSelect";
+import { CountryDataResponse } from "../../types/CountryData";
+import { UpdatePrefixData } from "../../types/Prefix";
+import { SQUpdate } from "../../SQ/SQUpdate";
+import { SQInsert } from "../../SQ/SQInsert";
+import path from "path";
+import fs from "fs";
 export class Route_Location extends Routes
 {
     static routeName = "/location";
@@ -19,8 +20,31 @@ export class Route_Location extends Routes
         app.post(`${this.routeName}/getcity`, (req, res) => this.middleware(req, res, this.getCityByCountryOrSubdivision));
         app.post(`${this.routeName}/getzipcode`, (req, res) => this.middleware(req, res, this.getZipCodeByCity));
         app.post(`${this.routeName}/updateprefixlocation`, (req, res) => this.middleware(req, res, this.updatePrefixLocation));
-
+        app.get(`/geofeed/:asnumber/geofeed.csv`, (req, res) => this.getcsv(req, res));
     }
+
+    private static getcsv = async (req: Request, res: Response): Promise<void> =>
+    {
+        const { asnumber } = req.params; // 获取动态参数 asnumber
+        const csvPath = path.join(process.cwd(), `/data/geofeed/${asnumber}/geofeed.csv`); // 真实路径
+
+        try
+        {
+            // 检查文件是否存在
+            if (!fs.existsSync(csvPath))
+            {
+                res.status(404).json({ message: "CSV file not found, please build the geofeed first" });
+                return
+            }
+
+            // 返回 CSV 文件
+            res.sendFile(csvPath);
+        } catch (error)
+        {
+            console.error("Error serving CSV:", error);
+            res.status(500).json({ message: "An error occurred while retrieving the CSV file." });
+        }
+    };
 
     private static getCountryList = async (req: Request): Promise<CommonResponse<CountryDataResponse[]>> =>
     {
@@ -143,7 +167,7 @@ export class Route_Location extends Routes
         const countryID = Number(req.body.countryID) || undefined;
         const subdivisionID = Number(req.body.subdivisionID) || undefined;
 
-        if (subdivisionID)
+        if (subdivisionID && subdivisionID > 0)
         {
             const city = await SQSelect.geolocation.getCityBySubdivisionID(subdivisionID);
 
@@ -174,7 +198,6 @@ export class Route_Location extends Routes
                 data: cityData,
             }
         }
-
         if (countryID)
         {
             const city = await SQSelect.geolocation.getCityByCountryID(countryID);
@@ -261,7 +284,7 @@ export class Route_Location extends Routes
 
     }
 
-    private static updatePrefixLocation = async (req: Request): Promise<CommonResponse<CountryDataResponse[]>> =>
+    private static updatePrefixLocation = async (req: Request): Promise<CommonResponse<number>> =>
     {
         const userdata = req.session.user;
 
@@ -397,6 +420,18 @@ export class Route_Location extends Routes
                     message: updateSubdivitionResult.message,
                 }
             }
+        }
+
+        if (updatePrefixData.subdivisionsid === null)
+        {
+            const updateSubdivitionResult = await SQUpdate.prefix.updatePrefixSubdivitionToNull(updatePrefixData.prefixID);
+            if (updateSubdivitionResult.error)
+            {
+                return {
+                    code: ReturnCode('ISE'),
+                    message: updateSubdivitionResult.message,
+                }
+            }
 
         }
 
@@ -521,22 +556,32 @@ export class Route_Location extends Routes
             }
         }
 
+        const asn = await SQSelect.asn.getASNByID(prefixIDResult.data.asn_id);
 
+        if (asn.error)
+        {
+            return {
+                code: ReturnCode('ISE'),
+                message: asn.message,
+            }
+        }
 
+        if (!asn.data)
+        {
+            return {
+                code: ReturnCode('NotFound'),
+                message: "No ASN data found",
+            }
+        }
 
-
-        console.log(updatePrefixData)
+        const asnumber = Number(asn.data.as_number);
 
         return {
-            code: ReturnCode('OPFailed'),
+            code: ReturnCode('OPSuccess'),
             message: "Success",
-            data: undefined,
+            data: asnumber,
         }
 
 
     }
-
-
-
-
 }

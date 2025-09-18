@@ -1,4 +1,4 @@
-import { CommonResponse } from "@/types/CommonResponse";
+import { CommonResponse } from "../types/CommonResponse";
 import { Request, Response } from "express";
 import { ReturnCode } from "../utils/ReturnCode";
 
