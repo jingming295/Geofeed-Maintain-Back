@@ -8,8 +8,6 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY dist ./dist
 COPY frontend ./frontend
-COPY .env .env
-
 # 安装依赖
 RUN npm install
 
