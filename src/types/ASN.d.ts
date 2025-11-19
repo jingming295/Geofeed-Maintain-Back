@@ -1,4 +1,4 @@
-export interface ASNData
+interface ASNData
 {
     asn: {
         asName: string;
@@ -9,7 +9,7 @@ export interface ASNData
     }
 }
 
-export interface AnnouncedPrefixesFromRile
+interface AnnouncedPrefixesFromRipe
 {
     messages: string[];
     see_also: string[];

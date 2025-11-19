@@ -209,6 +209,32 @@ export class SQSelect extends SQInit
     }
 
     public static prefix = {
+        getAllPrefixesWhereNoCountry: async (asnId: number): Promise<DatabaseResult<Prefixes[]>> =>
+        {
+            try
+            {
+                const prefixResult = await Prefixes.findAll({
+                    attributes: ['id', 'prefix'],
+                    where: {
+                        asn_id: asnId,
+                        country_id: null
+                    }
+                })
+
+                return {
+                    message: "Prefix found",
+                    data: prefixResult,
+                }
+
+            } catch (error)
+            {
+                console.error("Error in prefix.getPrefixByASNId: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
         getPrefixByASNId: async (asnId: number): Promise<DatabaseResult<Prefixes[]>> =>
         {
             try
@@ -351,6 +377,28 @@ export class SQSelect extends SQInit
             } catch (error)
             {
                 console.error("Error in geolocation.getCountry: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
+        getSubdivisionList: async (): Promise<DatabaseResult<Subdivision[]>> =>
+        {
+            try
+            {
+                const subdivisionResult = await Subdivision.findAll({
+                    where: {
+                        is_deleted: false
+                    }
+                })
+                return {
+                    message: "Subdivision found",
+                    data: subdivisionResult,
+                }
+            } catch (error)
+            {
+                console.error("Error in geolocation.getSubdivisionList: ", error);
                 return {
                     message: "Database error",
                     error: true,
@@ -661,6 +709,28 @@ export class SQSelect extends SQInit
             } catch (error)
             {
                 console.error("Error in geolocation.validateZipCodeID: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
+        },
+        getCountryIDByCountryCodeISO3: async (country_code_iso3: number): Promise<DatabaseResult<number | null>> =>
+        {
+            try
+            {
+                const countryResult = await Country.findOne({
+                    where: {
+                        alpha_3_code: country_code_iso3,
+                    }
+                })
+                return {
+                    message: "Prefix found",
+                    data: countryResult ? countryResult.id : null,
+                }
+            } catch (error)
+            {
+                console.error("Error in prefix.getCountryIDByPrefixID: ", error);
                 return {
                     message: "Database error",
                     error: true,

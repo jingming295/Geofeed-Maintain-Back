@@ -1,12 +1,6 @@
 export interface Config
 {
     geonamesUsername: string,
-    database: {
-        databaseName: string,
-        username: string,
-        password: string,
-        databaseHost: string,
-    }
     smtp?: SMTP
 }
 

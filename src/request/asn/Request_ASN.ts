@@ -1,4 +1,3 @@
-import { AnnouncedPrefixesFromRile } from "../../types/ASN";
 import { SendRequest } from "../SendRequest";
 
 export class Request_ASN extends SendRequest
@@ -30,13 +29,12 @@ export class Request_ASN extends SendRequest
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const data = await response.json() as AnnouncedPrefixesFromRile;
+            const data = await response.json() as AnnouncedPrefixesFromRipe;
 
             return data
         } catch (error)
         {
-            console.error("Error fetching country codes:", error);
-            throw error; // Re-throw the error for further handling if needed
+            console.error("Error fetching announced prefixes from Ripe:", error);
         }
 
     }

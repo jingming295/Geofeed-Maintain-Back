@@ -87,12 +87,12 @@ class App
         // Then, configure the static middleware for serving frontend files
         this.app.use(express.static(path.join(process.cwd(), '/frontend/dist')));
 
-        // Finally, add a fallback route for SPA (Single Page Application) routing
-        this.app.get('*', (req, res) =>
+        this.app.use((req, res) =>
         {
             const frontend = path.join(process.cwd(), '/frontend/dist/index.html');
             res.sendFile(frontend);
         });
+
     }
 
 
@@ -107,27 +107,8 @@ class App
 
     private static setupConfig(): Config
     {
-        const missingEnvVars: string[] = []; // 用于记录缺失的变量名
-
-        const dbName = process.env.DATABASE_NAME || missingEnvVars.push('DATABASE_NAME');
-        const dbUsername = process.env.DATABASE_USERNAME || missingEnvVars.push('DATABASE_USERNAME');
-        const dbPassword = process.env.DATABASE_PASSWORD || ""
-        const dbDatabaseHost = process.env.DATABASE_HOST || missingEnvVars.push('DATABASE_HOST');
-
-        const geonamesUsername = process.env.GEONAMES_USERNAME || missingEnvVars.push('GEONAMES_USERNAME');
-        // 如果存在缺失的变量，抛出错误并提示缺失的变量名
-        if (missingEnvVars.length > 0)
-        {
-            throw new Error(`Missing environment variables: ${missingEnvVars.join(', ')}`);
-        }
         const config: Config = {
-            geonamesUsername: geonamesUsername as string,
-            database: {
-                databaseName: dbName as string,
-                username: dbUsername as string,
-                password: dbPassword as string,
-                databaseHost: dbDatabaseHost as string,
-            },
+            geonamesUsername: "jingming295" as string,
         };
 
         return config;
