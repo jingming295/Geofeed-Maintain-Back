@@ -11,6 +11,7 @@ import { Route_ASN } from './routes/asn/Route_ASN';
 import { Route_Prefix } from './routes/prefix/Route_Prefix';
 import { Route_Location } from './routes/location/Route_Location';
 import path from 'path';
+import { SelfCheckPrefix } from './services/SelfCheckPrefix';
 
 class App
 {
@@ -102,6 +103,7 @@ class App
         this.app.listen(PORT, () =>
         {
             console.log(`Server is running on http://localhost:${PORT}`);
+            SelfCheckPrefix.start();
         });
     }
 

@@ -60,7 +60,6 @@ export class Route_ASN extends Routes
         for (const asn of asnResult.data)
         {
             const prefixResult = await SQSelect.asn.getPrefixByASNId(asn.id);
-
             if (prefixResult.error) return {
                 code: ReturnCode('ISE'),
                 message: "Database error",
@@ -305,6 +304,24 @@ export class Route_ASN extends Routes
                 message: "ASN Not Found",
             }
             const prefix = prefixesFromRipe.data.prefixes;
+
+            const selfPrefixData = await SQSelect.asn.getPrefixByASNId(asnResult.data.id);
+
+            selfPrefixData.data?.forEach(async (p) =>
+            {
+                const exists = prefix.some((pf) => pf.prefix === p.prefix);
+
+                if (!exists)
+                {
+                    p.destroy().catch((err) =>
+                    {
+                        console.error(`Failed to delete prefix ${p.prefix}:`, err);
+                    });
+                    console.log(`Deleted prefix ${p.prefix} for ASN ${body.asn}`);
+                }
+
+            })
+
 
             for (const prefixData of prefix)
             {

@@ -189,7 +189,7 @@ export class Route_Prefix extends Routes
 
         const asnId = asnResult.data.id;
 
-        const prefixResult = await SQSelect.prefix.getPrefixByASNId(asnId);
+        const prefixResult = await SQSelect.prefix.getPrefixAndLocationByASNId(asnId);
 
         if (prefixResult.error) return {
             code: ReturnCode('ISE'),

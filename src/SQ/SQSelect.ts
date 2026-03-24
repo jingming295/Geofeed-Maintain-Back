@@ -124,7 +124,7 @@ export class SQSelect extends SQInit
 
             } catch (error)
             {
-                console.error("Error in asn.getPrefixByASNId: ", error);
+                console.error("Error in asn.getPrefixAndLocationByASNId: ", error);
                 return {
                     message: "Database error",
                     error: true,
@@ -205,6 +205,30 @@ export class SQSelect extends SQInit
                     error: true,
                 }
             }
+        },
+        getAllASN: async (): Promise<DatabaseResult<ASN[]>> =>
+        {
+            try
+            {
+                const asnResult = await ASN.findAll({
+                    where: {
+                        is_active: true,
+                        is_deleted: false
+                    }
+                })
+
+                return {
+                    message: "ASN found",
+                    data: asnResult,
+                }
+            } catch (error)
+            {
+                console.error("Error in asn.getAllASN: ", error);
+                return {
+                    message: "Database error",
+                    error: true,
+                }
+            }
         }
     }
 
@@ -228,14 +252,14 @@ export class SQSelect extends SQInit
 
             } catch (error)
             {
-                console.error("Error in prefix.getPrefixByASNId: ", error);
+                console.error("Error in prefix.getAllPrefixesWhereNoCountry: ", error);
                 return {
                     message: "Database error",
                     error: true,
                 }
             }
         },
-        getPrefixByASNId: async (asnId: number): Promise<DatabaseResult<Prefixes[]>> =>
+        getPrefixAndLocationByASNId: async (asnId: number): Promise<DatabaseResult<Prefixes[]>> =>
         {
             try
             {
@@ -266,7 +290,7 @@ export class SQSelect extends SQInit
 
             } catch (error)
             {
-                console.error("Error in prefix.getPrefixByASNId: ", error);
+                console.error("Error in prefix.getPrefixAndLocationByASNId: ", error);
                 return {
                     message: "Database error",
                     error: true,
@@ -317,7 +341,7 @@ export class SQSelect extends SQInit
                     error: true,
                 }
             }
-        },
+        }
     }
 
     public static geolocation = {
